@@ -35,7 +35,7 @@ export default {
   },
   data() {
     return {
-      title: '若依管理系统',
+      title: '亿超环保管理系统',
       logo: logoImg
     }
   }

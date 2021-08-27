@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.MonitoringPointMapper">
+    
+    <resultMap type="MonitoringPoint" id="MonitoringPointResult">
+        <result property="id"    column="id"    />
+        <result property="name"    column="name"    />
+        <result property="mn"    column="mn"    />
+        <result property="orgId"    column="org_id"    />
+    </resultMap>
+
+    <sql id="selectMonitoringPointVo">
+        select id, name, mn, org_id from monitoring_point
+    </sql>
+
+    <select id="selectMonitoringPointList" parameterType="MonitoringPoint" resultMap="MonitoringPointResult">
+        <include refid="selectMonitoringPointVo"/>
+        <where>  
+            <if test="name != null  and name != ''"> and name like concat('%', #{name}, '%')</if>
+            <if test="mn != null  and mn != ''"> and mn = #{mn}</if>
+            <if test="orgId != null "> and org_id = #{orgId}</if>
+        </where>
+    </select>
+    
+    <select id="selectMonitoringPointById" parameterType="Long" resultMap="MonitoringPointResult">
+        <include refid="selectMonitoringPointVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertMonitoringPoint" parameterType="MonitoringPoint" useGeneratedKeys="true" keyProperty="id">
+        insert into monitoring_point
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="name != null and name != ''">name,</if>
+            <if test="mn != null and mn != ''">mn,</if>
+            <if test="orgId != null">org_id,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="name != null and name != ''">#{name},</if>
+            <if test="mn != null and mn != ''">#{mn},</if>
+            <if test="orgId != null">#{orgId},</if>
+         </trim>
+    </insert>
+
+    <update id="updateMonitoringPoint" parameterType="MonitoringPoint">
+        update monitoring_point
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="name != null and name != ''">name = #{name},</if>
+            <if test="mn != null and mn != ''">mn = #{mn},</if>
+            <if test="orgId != null">org_id = #{orgId},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteMonitoringPointById" parameterType="Long">
+        delete from monitoring_point where id = #{id}
+    </delete>
+
+    <delete id="deleteMonitoringPointByIds" parameterType="String">
+        delete from monitoring_point where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

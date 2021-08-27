@@ -119,6 +119,11 @@
             <artifactId>javax.servlet-api</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>com.github.xiaoyao9184</groupId>
+            <artifactId>hj-t212-parser</artifactId>
+        </dependency>
+
     </dependencies>
 
 </project>

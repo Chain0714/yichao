@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.DataLogMapper">
+    
+    <resultMap type="DataLog" id="DataLogResult">
+        <result property="id"    column="id"    />
+        <result property="st"    column="st"    />
+        <result property="cn"    column="cn"    />
+        <result property="mn"    column="mn"    />
+        <result property="flag"    column="flag"    />
+        <result property="dataTime"    column="data_time"    />
+    </resultMap>
+
+    <resultMap id="DataLogLogDetailResult" type="DataLog" extends="DataLogResult">
+        <collection property="logDetailList" notNullColumn="sub_id" javaType="java.util.List" resultMap="LogDetailResult" />
+    </resultMap>
+
+    <resultMap type="LogDetail" id="LogDetailResult">
+        <result property="id"    column="sub_id"    />
+        <result property="factorCode"    column="sub_factor_code"    />
+        <result property="factorVal"    column="sub_factor_val"    />
+        <result property="logId"    column="sub_log_id"    />
+    </resultMap>
+
+    <resultMap type="DataHistoryDto" id="DataHistoryDtoResult">
+        <result property="mn"    column="mn"    />
+        <result property="pointName"    column="point_name"    />
+        <result property="cn"    column="cn"    />
+        <result property="factorCode"    column="factor_code"    />
+        <result property="factorName"    column="factor_name"    />
+        <result property="factorVal"    column="factor_val"    />
+        <result property="dataTime"    column="data_time"    />
+    </resultMap>
+
+    <sql id="selectDataLogVo">
+        select id, st, cn, mn, flag, data_time from data_log
+    </sql>
+
+    <select id="selectDataLogList" parameterType="DataLog" resultMap="DataHistoryDtoResult">
+        select
+        mp.name as point_name,
+        dl.cn ,
+        fi.code as factor_code,
+        fi.name as factor_name,
+        concat_ws('',ld.factor_val, fi.unit) as factor_val,
+        dl.data_time
+        from
+        data_log dl
+        inner join log_detail ld on
+        dl.id = ld.log_id
+        inner join factor_info fi on
+        ld.factor_code = fi.code
+        inner join monitoring_point mp on
+        dl.mn = mp.mn
+        inner join sys_dept sd on
+        mp.org_id = sd.dept_id
+        <where>  
+            <if test="mn != null  and mn != ''"> and dl.mn = #{mn}</if>
+            <if test="params.factorCode != null and params.factorCode != ''"> and ld.factor_code = #{params.factorCode}</if>
+            <if test="params.beginDataTime != null and params.beginDataTime != '' and params.endDataTime != null and params.endDataTime != ''"> and dl.data_time between #{params.beginDataTime} and #{params.endDataTime}</if>
+        </where>
+    </select>
+    
+    <select id="selectDataLogById" parameterType="Long" resultMap="DataLogLogDetailResult">
+        select a.id, a.st, a.cn, a.mn, a.flag, a.data_time,
+            b.id as sub_id, b.factor_code as sub_factor_code, b.factor_val as sub_factor_val, b.log_id as sub_log_id
+        from data_log a
+        left join log_detail b on b.log_id = a.id
+        where a.id = #{id}
+    </select>
+    <select id="selectLogReal" parameterType="String" resultMap="DataHistoryDtoResult">
+        select
+            ld.mn,
+            mp.name as point_name,
+            fi.code as factor_code,
+            fi.name as factor_name,
+            concat_ws('',ld.factor_val, fi.unit) as factor_val,
+            ld.data_time
+        from
+            log_detail_real ld
+        inner join factor_info fi on
+            ld.factor_code = fi.code
+        inner join monitoring_point mp on
+            ld.mn = mp.mn
+        inner join sys_dept sd on
+            mp.org_id = sd.dept_id
+        <where>
+            <if test="mn != null  and mn != ''"> and ld.mn = #{mn}</if>
+        </where>
+    </select>
+
+    <insert id="insertDataLog" parameterType="DataLog" useGeneratedKeys="true" keyProperty="id">
+        insert into data_log
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="st != null">st,</if>
+            <if test="cn != null">cn,</if>
+            <if test="mn != null and mn != ''">mn,</if>
+            <if test="flag != null">flag,</if>
+            <if test="dataTime != null">data_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="st != null">#{st},</if>
+            <if test="cn != null">#{cn},</if>
+            <if test="mn != null and mn != ''">#{mn},</if>
+            <if test="flag != null">#{flag},</if>
+            <if test="dataTime != null">#{dataTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateDataLog" parameterType="DataLog">
+        update data_log
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="st != null">st = #{st},</if>
+            <if test="cn != null">cn = #{cn},</if>
+            <if test="mn != null and mn != ''">mn = #{mn},</if>
+            <if test="flag != null">flag = #{flag},</if>
+            <if test="dataTime != null">data_time = #{dataTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteDataLogById" parameterType="Long">
+        delete from data_log where id = #{id}
+    </delete>
+
+    <delete id="deleteDataLogByIds" parameterType="String">
+        delete from data_log where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    
+    <delete id="deleteLogDetailByLogIds" parameterType="String">
+        delete from log_detail where log_id in 
+        <foreach item="logId" collection="array" open="(" separator="," close=")">
+            #{logId}
+        </foreach>
+    </delete>
+
+    <delete id="deleteLogDetailByLogId" parameterType="Long">
+        delete from log_detail where log_id = #{logId}
+    </delete>
+    <delete id="deleteLogDetailByMn" parameterType="string">
+        delete from log_detail_real where mn = #{mn}
+    </delete>
+
+    <insert id="batchLogDetail">
+        insert into log_detail( id, factor_code, factor_val, log_id) values
+		<foreach item="item" index="index" collection="list" separator=",">
+            ( #{item.id}, #{item.factorCode}, #{item.factorVal}, #{item.logId})
+        </foreach>
+    </insert>
+    <insert id="batchLogDetailReal">
+        insert into log_detail_real( mn, factor_code, factor_val, data_time) values
+        <foreach item="item" index="index" collection="list" separator=",">
+            ( #{item.mn}, #{item.factorCode}, #{item.factorVal}, #{item.dataTime})
+        </foreach>
+    </insert>
+</mapper>

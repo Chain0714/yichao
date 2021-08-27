@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.FactorInfoMapper">
+    
+    <resultMap type="FactorInfo" id="FactorInfoResult">
+        <result property="id"    column="id"    />
+        <result property="code"    column="code"    />
+        <result property="name"    column="name"    />
+        <result property="protocolType"    column="protocol_type"    />
+        <result property="unit"    column="unit"    />
+    </resultMap>
+
+    <sql id="selectFactorInfoVo">
+        select id, code, name, protocol_type, unit from factor_info
+    </sql>
+
+    <select id="selectFactorInfoList" parameterType="FactorInfo" resultMap="FactorInfoResult">
+        <include refid="selectFactorInfoVo"/>
+        <where>  
+            <if test="code != null  and code != ''"> and code = #{code}</if>
+            <if test="name != null  and name != ''"> and name like concat('%', #{name}, '%')</if>
+            <if test="protocolType != null "> and protocol_type = #{protocolType}</if>
+        </where>
+    </select>
+    
+    <select id="selectFactorInfoById" parameterType="Long" resultMap="FactorInfoResult">
+        <include refid="selectFactorInfoVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertFactorInfo" parameterType="FactorInfo" useGeneratedKeys="true" keyProperty="id">
+        insert into factor_info
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="code != null and code != ''">code,</if>
+            <if test="name != null and name != ''">name,</if>
+            <if test="protocolType != null">protocol_type,</if>
+            <if test="unit != null">unit,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="code != null and code != ''">#{code},</if>
+            <if test="name != null and name != ''">#{name},</if>
+            <if test="protocolType != null">#{protocolType},</if>
+            <if test="unit != null">#{unit},</if>
+         </trim>
+    </insert>
+
+    <update id="updateFactorInfo" parameterType="FactorInfo">
+        update factor_info
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="code != null and code != ''">code = #{code},</if>
+            <if test="name != null and name != ''">name = #{name},</if>
+            <if test="protocolType != null">protocol_type = #{protocolType},</if>
+            <if test="unit != null">unit = #{unit},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteFactorInfoById" parameterType="Long">
+        delete from factor_info where id = #{id}
+    </delete>
+
+    <delete id="deleteFactorInfoByIds" parameterType="String">
+        delete from factor_info where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

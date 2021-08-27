@@ -10,7 +10,7 @@
 
     <name>ruoyi</name>
     <url>http://www.ruoyi.vip</url>
-    <description>若依管理系统</description>
+    <description>亿超环保管理系统</description>
     
     <properties>
         <ruoyi.version>3.6.0</ruoyi.version>
@@ -203,6 +203,12 @@
                 <groupId>com.ruoyi</groupId>
                 <artifactId>ruoyi-common</artifactId>
                 <version>${ruoyi.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.github.xiaoyao9184</groupId>
+                <artifactId>hj-t212-parser</artifactId>
+                <version>0.1-SNAPSHOT</version>
             </dependency>
 
         </dependencies>

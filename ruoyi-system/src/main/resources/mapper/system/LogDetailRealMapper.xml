@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.LogDetailRealMapper">
+    
+    <resultMap type="LogDetailReal" id="LogDetailRealResult">
+        <result property="id"    column="id"    />
+        <result property="mn"    column="mn"    />
+        <result property="factorCode"    column="factor_code"    />
+        <result property="factorVal"    column="factor_val"    />
+        <result property="logId"    column="log_id"    />
+        <result property="datatime"    column="datatime"    />
+    </resultMap>
+
+    <sql id="selectLogDetailRealVo">
+        select id, mn, factor_code, factor_val, log_id, datatime from log_detail_real
+    </sql>
+
+    <select id="selectLogDetailRealList" parameterType="LogDetailReal" resultMap="LogDetailRealResult">
+        <include refid="selectLogDetailRealVo"/>
+        <where>  
+            <if test="mn != null  and mn != ''"> and mn = #{mn}</if>
+            <if test="factorCode != null  and factorCode != ''"> and factor_code = #{factorCode}</if>
+            <if test="factorVal != null  and factorVal != ''"> and factor_val = #{factorVal}</if>
+            <if test="logId != null "> and log_id = #{logId}</if>
+            <if test="datatime != null "> and datatime = #{datatime}</if>
+        </where>
+    </select>
+    
+    <select id="selectLogDetailRealById" parameterType="Long" resultMap="LogDetailRealResult">
+        <include refid="selectLogDetailRealVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertLogDetailReal" parameterType="LogDetailReal" useGeneratedKeys="true" keyProperty="id">
+        insert into log_detail_real
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="mn != null and mn != ''">mn,</if>
+            <if test="factorCode != null and factorCode != ''">factor_code,</if>
+            <if test="factorVal != null">factor_val,</if>
+            <if test="logId != null">log_id,</if>
+            <if test="datatime != null">datatime,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="mn != null and mn != ''">#{mn},</if>
+            <if test="factorCode != null and factorCode != ''">#{factorCode},</if>
+            <if test="factorVal != null">#{factorVal},</if>
+            <if test="logId != null">#{logId},</if>
+            <if test="datatime != null">#{datatime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateLogDetailReal" parameterType="LogDetailReal">
+        update log_detail_real
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="mn != null and mn != ''">mn = #{mn},</if>
+            <if test="factorCode != null and factorCode != ''">factor_code = #{factorCode},</if>
+            <if test="factorVal != null">factor_val = #{factorVal},</if>
+            <if test="logId != null">log_id = #{logId},</if>
+            <if test="datatime != null">datatime = #{datatime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteLogDetailRealById" parameterType="Long">
+        delete from log_detail_real where id = #{id}
+    </delete>
+
+    <delete id="deleteLogDetailRealByIds" parameterType="String">
+        delete from log_detail_real where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

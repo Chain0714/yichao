@@ -1,7 +1,7 @@
 {
   "name": "ruoyi",
   "version": "3.6.0",
-  "description": "若依管理系统",
+  "description": "亿超环保管理系统",
   "author": "若依",
   "license": "MIT",
   "scripts": {
@@ -67,7 +67,7 @@
     "babel-eslint": "10.1.0",
     "chalk": "4.1.0",
     "connect": "3.6.6",
-    "eslint": "7.15.0",
+    "eslint": "6.8.0",
     "eslint-plugin-vue": "7.2.0",
     "lint-staged": "10.5.3",
     "runjs": "4.4.2",
