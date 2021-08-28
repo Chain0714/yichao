@@ -1,6 +1,5 @@
 package com.ruoyi.system.service.impl;
 
-import com.ruoyi.common.utils.http.HttpUtils;
 import com.ruoyi.system.domain.DataLog;
 import com.ruoyi.system.domain.LogDetail;
 import com.ruoyi.system.domain.LogDetailReal;
@@ -14,10 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class HjParseServiceImpl implements IHjParseService {
@@ -32,21 +28,29 @@ public class HjParseServiceImpl implements IHjParseService {
     private DataLogMapper dataLogMapper;
 
     @Override
-    public void process(String s) {
+    public void process(String msg) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
         T212Mapper mapper = new T212Mapper()
                 .enableDefaultParserFeatures()
                 .enableDefaultVerifyFeatures();
         try {
-            Map<String, Object> data = mapper.readDeepMap(s);
-            Map<String, String> cp = (Map<String, String>) data.get("CP");
+            Map<String, String> data = mapper.readMap(msg);
+            String cp = data.get("CP");
+            String[] split = cp.split("[;,]");
+            Map<String,String> cpMap = new HashMap<>();
+            for (String s : split){
+                String[] sp = s.split("=");
+                if(sp.length==2){
+                    cpMap.put(sp[0],sp[1]);
+                }
+            }
             //实时数据
             if ("2011".equals(data.get("CN"))) {
-                Date dataTime = sdf.parse((((Map<String, String>) data.get("CP")).get("DataTime") + ""));
+                Date dataTime = sdf.parse((cpMap.get("DataTime")));
                 String mn = data.get("MN") + "";
                 List<LogDetailReal> list = new ArrayList<>();
 
-                cp.forEach((k, v) -> {
+                cpMap.forEach((k, v) -> {
                     if (!"DataTime".equals(k)) {
                         list.add(new LogDetailReal(mn, k, v, dataTime));
                     }
@@ -60,11 +64,11 @@ public class HjParseServiceImpl implements IHjParseService {
                 dataLog.setSt(data.get("ST") + "");
                 dataLog.setCn(data.get("CN") + "");
                 dataLog.setMn(data.get("MN") + "");
-                dataLog.setDataTime(sdf.parse((((Map<String, String>) data.get("CP")).get("DataTime") + "")));
+                dataLog.setDataTime(sdf.parse((cpMap.get("DataTime") + "")));
 
                 List<LogDetail> list = new ArrayList<>();
 
-                cp.forEach((k, v) -> {
+                cpMap.forEach((k, v) -> {
                     if (!"DataTime".equals(k)) {
                         list.add(new LogDetail(k, v));
                     }

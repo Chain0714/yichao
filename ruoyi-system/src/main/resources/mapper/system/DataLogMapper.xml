@@ -56,11 +56,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         dl.mn = mp.mn
         inner join sys_dept sd on
         mp.org_id = sd.dept_id
-        <where>  
+        where 1=1 ${params.dataScope}
             <if test="mn != null  and mn != ''"> and dl.mn = #{mn}</if>
             <if test="params.factorCode != null and params.factorCode != ''"> and ld.factor_code = #{params.factorCode}</if>
             <if test="params.beginDataTime != null and params.beginDataTime != '' and params.endDataTime != null and params.endDataTime != ''"> and dl.data_time between #{params.beginDataTime} and #{params.endDataTime}</if>
-        </where>
     </select>
     
     <select id="selectDataLogById" parameterType="Long" resultMap="DataLogLogDetailResult">
@@ -86,9 +85,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             ld.mn = mp.mn
         inner join sys_dept sd on
             mp.org_id = sd.dept_id
-        <where>
+        where 1=1 ${params.dataScope}
             <if test="mn != null  and mn != ''"> and ld.mn = #{mn}</if>
-        </where>
     </select>
 
     <insert id="insertDataLog" parameterType="DataLog" useGeneratedKeys="true" keyProperty="id">
