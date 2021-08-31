@@ -2,7 +2,7 @@
   <div class="app-container">
     <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px">
       <el-form-item label="数据类型" prop="cn">
-        <el-select v-model="queryParams.cn" placeholder="请选择数据类型" clearable size="small">
+        <el-select v-model="queryParams.cn" placeholder="请选择数据类型" clearable>
           <el-option
             v-for="dict in cnOptions"
             :key="dict.dictValue"
@@ -12,7 +12,7 @@
         </el-select>
       </el-form-item>
       <el-form-item label="监测点" prop="mn">
-        <el-select v-model="queryParams.mn" placeholder="请选择监测点">
+        <el-select v-model="queryParams.mn" placeholder="请选择监测点" clearable>
           <el-option
             v-for="point in pointOptions"
             :key="point['id']"
@@ -22,7 +22,7 @@
         </el-select>
       </el-form-item>
       <el-form-item label="监测因子">
-        <el-select v-model="factorCode" placeholder="请选择监测因子">
+        <el-select v-model="factorCode" placeholder="请选择监测因子" clearable>
           <el-option
             v-for="factor in factorOptions"
             :key="factor['id']"

@@ -31,7 +31,7 @@ public interface DataLogMapper
      */
     public List<DataHistoryDto> selectDataLogList(DataLog dataLog);
 
-    List<DataHistoryDto> selectLogReal(String mn);
+    List<DataHistoryDto> selectLogReal(DataLog dataLog);
 
     /**
      * 新增历史查询

@@ -20,7 +20,7 @@
         />
       </el-form-item>
       <el-form-item label="协议类型" prop="protocolType">
-        <el-select v-model="queryParams.protocolType" placeholder="请选择协议类型" clearable size="small">
+        <el-select v-model="queryParams.protocolType" placeholder="请选择协议类型" clearable>
           <el-option
             v-for="dict in protocolTypeOptions"
             :key="dict.dictValue"

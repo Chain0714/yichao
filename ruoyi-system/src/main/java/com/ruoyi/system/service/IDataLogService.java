@@ -31,7 +31,7 @@ public interface IDataLogService
      */
     public List<DataHistoryDto> selectDataLogList(DataLog dataLog);
 
-    Map<String, List<DataHistoryDto>> selectDataLogReal(String mn);
+    Map<String, List<DataHistoryDto>> selectDataLogReal(DataLog mn);
 
     /**
      * 新增历史查询

@@ -52,7 +52,7 @@ public class DataLogController extends BaseController {
     @PreAuthorize("@ss.hasPermi('pullution:real:list')")
     @GetMapping("/listReal")
     public Map<String, List<DataHistoryDto>> listReal(DataLog dataLog) {
-        return dataLogService.selectDataLogReal(dataLog.getMn());
+        return dataLogService.selectDataLogReal(dataLog);
     }
 
     /**

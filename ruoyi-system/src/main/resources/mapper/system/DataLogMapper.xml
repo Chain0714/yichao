@@ -57,8 +57,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         inner join sys_dept sd on
         mp.org_id = sd.dept_id
         where 1=1
-            <if test="params != null">${params.dataScope}</if>
+            <if test="params.dataScope != null and params.dataScope != ''">${params.dataScope}</if>
             <if test="mn != null  and mn != ''"> and dl.mn = #{mn}</if>
+            <if test="cn != null  and cn != ''"> and dl.cn = #{cn}</if>
             <if test="params.factorCode != null and params.factorCode != ''"> and ld.factor_code = #{params.factorCode}</if>
             <if test="params.beginDataTime != null and params.beginDataTime != '' and params.endDataTime != null and params.endDataTime != ''"> and dl.data_time between #{params.beginDataTime} and #{params.endDataTime}</if>
     </select>
@@ -70,7 +71,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         left join log_detail b on b.log_id = a.id
         where a.id = #{id}
     </select>
-    <select id="selectLogReal" parameterType="String" resultMap="DataHistoryDtoResult">
+    <select id="selectLogReal" parameterType="DataLog" resultMap="DataHistoryDtoResult">
         select
             ld.mn,
             mp.name as point_name,

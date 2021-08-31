@@ -20,7 +20,7 @@
         />
       </el-form-item>
       <el-form-item label="组织" prop="orgId">
-        <el-select v-model="queryParams.orgId" placeholder="请选择组织" clearable size="small">
+        <el-select v-model="queryParams.orgId" placeholder="请选择组织" clearable>
           <el-option
             v-for="dept in orgIdOptions"
             :key="dept.deptId"

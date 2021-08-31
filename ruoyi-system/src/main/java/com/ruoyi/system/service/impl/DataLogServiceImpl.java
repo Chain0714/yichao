@@ -53,9 +53,9 @@ public class DataLogServiceImpl implements IDataLogService {
     }
 
     @Override
-    public Map<String, List<DataHistoryDto>> selectDataLogReal(String mn) {
+    public Map<String, List<DataHistoryDto>> selectDataLogReal(DataLog dataLog) {
 
-        List<DataHistoryDto> list = dataLogMapper.selectLogReal(mn);
+        List<DataHistoryDto> list = dataLogMapper.selectLogReal(dataLog);
         return list.stream().collect(Collectors.groupingBy(DataHistoryDto::groupKey));
 
     }

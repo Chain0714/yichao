@@ -2,7 +2,7 @@
   <div class="app-container home">
     <el-form :model="queryParams" ref="queryForm" :inline="true" label-width="68px">
       <el-form-item label="监测点" prop="mn">
-        <el-select v-model="queryParams.mn" placeholder="请选择监测点">
+        <el-select v-model="queryParams.mn" placeholder="请选择监测点" clearable>
           <el-option
             v-for="point in pointOptions"
             :key="point['id']"
@@ -23,6 +23,9 @@
             <strong><span>{{key.split('|')[0]}}</span></strong>
           </div>
           <div class="body">
+            <p>
+              <i class="el-icon-chat-dot-round"></i> 数据时间：<a href="javascript:;">{{value[0].dataTime}}</a>
+            </p>
             <p v-for="val in value" :key="val.factorCode">
               <i class="el-icon-chat-dot-round"></i> {{val.factorName}}：<a href="javascript:;">{{val.factorVal}}</a>
             </p>
