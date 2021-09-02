@@ -16,12 +16,13 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </sql>
 
     <select id="selectMonitoringPointList" parameterType="MonitoringPoint" resultMap="MonitoringPointResult">
-        <include refid="selectMonitoringPointVo"/>
-        <where>  
-            <if test="name != null  and name != ''"> and name like concat('%', #{name}, '%')</if>
-            <if test="mn != null  and mn != ''"> and mn = #{mn}</if>
-            <if test="orgId != null "> and org_id = #{orgId}</if>
-        </where>
+        select mp.id, mp.name, mp.mn, mp.org_id from monitoring_point mp inner join sys_dept sd on
+        mp.org_id = sd.dept_id
+        where 1=1
+        <if test="params.dataScope != null and params.dataScope != ''">${params.dataScope}</if>
+        <if test="name != null  and name != ''"> and name like concat('%', #{name}, '%')</if>
+        <if test="mn != null  and mn != ''"> and mn = #{mn}</if>
+        <if test="orgId != null "> and org_id = #{orgId}</if>
     </select>
     
     <select id="selectMonitoringPointById" parameterType="Long" resultMap="MonitoringPointResult">

@@ -1,6 +1,8 @@
 package com.ruoyi.web.controller.pullution;
 
 import java.util.List;
+
+import com.ruoyi.common.annotation.DataScope;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -36,6 +38,7 @@ public class MonitoringPointController extends BaseController
     /**
      * 查询监测点信息列表
      */
+    @DataScope(deptAlias = "sd")
     @PreAuthorize("@ss.hasPermi('pullution:point:list')")
     @GetMapping("/list")
     public TableDataInfo list(MonitoringPoint monitoringPoint)
@@ -48,6 +51,7 @@ public class MonitoringPointController extends BaseController
     /**
      * 导出监测点信息列表
      */
+    @DataScope(deptAlias = "sd")
     @PreAuthorize("@ss.hasPermi('pullution:point:export')")
     @Log(title = "监测点信息", businessType = BusinessType.EXPORT)
     @GetMapping("/export")
