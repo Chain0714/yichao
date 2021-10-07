@@ -62,6 +62,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="cn != null  and cn != ''"> and dl.cn = #{cn}</if>
             <if test="params.factorCode != null and params.factorCode != ''"> and ld.factor_code = #{params.factorCode}</if>
             <if test="params.beginDataTime != null and params.beginDataTime != '' and params.endDataTime != null and params.endDataTime != ''"> and dl.data_time between #{params.beginDataTime} and #{params.endDataTime}</if>
+        order by dl.data_time desc
     </select>
     
     <select id="selectDataLogById" parameterType="Long" resultMap="DataLogLogDetailResult">
