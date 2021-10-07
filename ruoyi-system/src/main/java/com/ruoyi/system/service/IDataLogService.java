@@ -66,4 +66,6 @@ public interface IDataLogService
     public int deleteDataLogById(Long id);
 
     void insertReal(String mn,List<LogDetailReal> list);
+
+    void cleanHistory(String cn,Integer days);
 }

@@ -1,7 +1,9 @@
 package com.ruoyi.system.service.impl;
 
+import java.util.Date;
 import java.util.List;
 
+import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.system.domain.LogDetailReal;
 import com.ruoyi.system.domain.dto.DataHistoryDto;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -117,6 +119,15 @@ public class DataLogServiceImpl implements IDataLogService {
     public void insertReal(String mn, List<LogDetailReal> list) {
         dataLogMapper.deleteLogDetailByMn(mn);
         dataLogMapper.batchLogDetailReal(list);
+    }
+
+    @Override
+    @Transactional
+    public void cleanHistory(String cn, Integer days) {
+        Date date = DateUtils.addDays(new Date(), days * -1);
+        String dataStr = DateUtils.parseDateToStr("yyyy-MM-dd", date);
+        dataLogMapper.deleteDetail(cn,dataStr);
+        dataLogMapper.deleteLog(cn,dataStr);
     }
 
     /**

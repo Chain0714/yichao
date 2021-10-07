@@ -99,4 +99,7 @@ public interface DataLogMapper
      * @return 结果
      */
     public int deleteLogDetailByLogId(Long id);
+
+    int deleteDetail(@Param("cn") String cn, @Param("date") String date);
+    int deleteLog(@Param("cn") String cn, @Param("date") String date);
 }

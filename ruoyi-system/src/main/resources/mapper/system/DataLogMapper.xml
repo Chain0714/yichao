@@ -147,6 +147,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <delete id="deleteLogDetailByMn" parameterType="string">
         delete from log_detail_real where mn = #{mn}
     </delete>
+    <delete id="deleteDetail">
+        delete from log_detail where id in (select id from data_log where data_time <![CDATA[<]]> #{date} and cn = #{cn});
+    </delete>
+    <delete id="deleteLog">
+        delete from data_log where data_time <![CDATA[<]]> #{date} and cn = #{cn}
+    </delete>
 
     <insert id="batchLogDetail">
         insert into log_detail( id, factor_code, factor_val, log_id) values

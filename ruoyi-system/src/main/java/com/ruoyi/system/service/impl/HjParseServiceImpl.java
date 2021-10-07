@@ -14,12 +14,14 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class HjParseServiceImpl implements IHjParseService {
@@ -33,7 +35,11 @@ public class HjParseServiceImpl implements IHjParseService {
     @Autowired
     private DataLogMapper dataLogMapper;
 
+    @Autowired
+    public StringRedisTemplate redisTemplate;
+
     private static final String EXCLUDE_ST_KEY = "exclude_st";
+    private static final String MN_CACHE_PREFIX = "mn_cache_";
 
     @Override
     public void process(String msg) throws IOException, T212FormatException, ParseException {
@@ -41,56 +47,73 @@ public class HjParseServiceImpl implements IHjParseService {
         T212Mapper mapper = new T212Mapper()
                 .enableDefaultParserFeatures()
                 .enableDefaultVerifyFeatures();
-            Map<String, String> data = mapper.readMap(msg);
-            if(exclude(data.get("ST"))){
-                log.info("exclude");
-                return;
+        Map<String, String> data = mapper.readMap(msg);
+        if (exclude(data.get("ST"))) {
+            log.info("exclude");
+            return;
+        }
+        String cp = data.get("CP");
+        String[] split = cp.split("[;,]");
+        Map<String, String> cpMap = new HashMap<>();
+        for (String s : split) {
+            String[] sp = s.split("=");
+            if (sp.length == 2) {
+                cpMap.put(sp[0], sp[1]);
             }
-            String cp = data.get("CP");
-            String[] split = cp.split("[;,]");
-            Map<String, String> cpMap = new HashMap<>();
-            for (String s : split) {
-                String[] sp = s.split("=");
-                if (sp.length == 2) {
-                    cpMap.put(sp[0], sp[1]);
-                }
-            }
-            //实时数据
-            if ("2011".equals(data.get("CN"))) {
-                Date dataTime = sdf.parse((cpMap.get("DataTime")));
-                String mn = data.get("MN") + "";
-                List<LogDetailReal> list = new ArrayList<>();
-
-                cpMap.forEach((k, v) -> {
-                    if (!"DataTime".equals(k)) {
-                        list.add(new LogDetailReal(mn, k, v, dataTime));
-                    }
-                });
-                dataLogMapper.deleteLogDetailByMn(mn);
-                dataLogMapper.batchLogDetailReal(list);
-            }
-            DataLog dataLog = new DataLog();
-            dataLog.setSt(data.get("ST") + "");
-            dataLog.setCn(data.get("CN") + "");
-            dataLog.setMn(data.get("MN") + "");
-            dataLog.setDataTime(sdf.parse((cpMap.get("DataTime") + "")));
-
-            List<LogDetail> list = new ArrayList<>();
+        }
+        //实时数据
+        if ("2011".equals(data.get("CN"))) {
+            Date dataTime = sdf.parse((cpMap.get("DataTime")));
+            String mn = data.get("MN") + "";
+            List<LogDetailReal> list = new ArrayList<>();
 
             cpMap.forEach((k, v) -> {
                 if (!"DataTime".equals(k)) {
-                    list.add(new LogDetail(k, v));
+                    list.add(new LogDetailReal(mn, k, v, dataTime));
                 }
             });
-            dataLog.setLogDetailList(list);
-            dataLogService.insertDataLog(dataLog);
+            dataLogMapper.deleteLogDetailByMn(mn);
+            dataLogMapper.batchLogDetailReal(list);
+        }
+        DataLog dataLog = new DataLog();
+        dataLog.setSt(data.get("ST") + "");
+        dataLog.setCn(data.get("CN") + "");
+        dataLog.setMn(data.get("MN") + "");
+
+        if (!checkKey(data.get("ST") + "", data.get("CN") + "", data.get("MN") + "")) {
+            log.info("十分钟以内只记录1条数据,结束");
+            return;
+        }
+
+        dataLog.setDataTime(sdf.parse((cpMap.get("DataTime") + "")));
+
+        List<LogDetail> list = new ArrayList<>();
+
+        cpMap.forEach((k, v) -> {
+            if (!"DataTime".equals(k)) {
+                list.add(new LogDetail(k, v));
+            }
+        });
+        dataLog.setLogDetailList(list);
+        dataLogService.insertDataLog(dataLog);
     }
 
-    private boolean exclude(String st){
+    private boolean exclude(String st) {
         List<SysDictData> dictCache = DictUtils.getDictCache(EXCLUDE_ST_KEY);
-        if(CollectionUtils.isEmpty(dictCache)){
+        if (CollectionUtils.isEmpty(dictCache)) {
             return true;
         }
-        return dictCache.stream().map(SysDictData::getDictValue).anyMatch(o->o.equals(st));
+        return dictCache.stream().map(SysDictData::getDictValue).anyMatch(o -> o.equals(st));
+    }
+
+    private boolean checkKey(String st, String cn, String mn) {
+        String key = MN_CACHE_PREFIX + st + "_" + cn + "_" + mn;
+        Boolean hasKey = redisTemplate.hasKey(key);
+        if (hasKey != null && hasKey) {
+            return false;
+        } else {
+            redisTemplate.opsForValue().set(key, "locked", 590, TimeUnit.SECONDS);
+            return true;
+        }
     }
 }
