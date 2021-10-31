@@ -15,10 +15,10 @@
  */
 package com.ruoyi.netty.handler;
 
-import com.alibaba.fastjson.JSON;
 import com.ruoyi.netty.ChannelRepository;
+import com.ruoyi.netty.ContextRepository;
+import com.ruoyi.netty.TCPServer;
 import com.ruoyi.system.service.IHjParseService;
-import com.xy.format.hbt212.core.T212Mapper;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
@@ -28,7 +28,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
-import java.util.Map;
 
 /**
  * event handler to process receiving messages
@@ -41,25 +40,27 @@ import java.util.Map;
 @ChannelHandler.Sharable
 public class SimpleChatServerHandler extends ChannelInboundHandlerAdapter {
 
-    private final ChannelRepository channelRepository;
+    private final ContextRepository contextRepository;
 
-    @Autowired
-    private IHjParseService hjParseService;
+
+    private final IHjParseService hjParseService;
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) {
-        Assert.notNull(this.channelRepository, "[Assertion failed] - ChannelRepository is required; it must not be null");
+        Assert.notNull(this.contextRepository, "[Assertion failed] - contextRepository is required; it must not be null");
 
         ctx.fireChannelActive();
         if (log.isDebugEnabled()) {
             log.debug(ctx.channel().remoteAddress() + "");
         }
         String remoteAddress = ctx.channel().remoteAddress().toString();
+        String id = ctx.channel().id().toString();
+        contextRepository.put(id, ctx);
 
-//        ctx.writeAndFlush("Your remote address is " + remoteAddress + ".\r\n");
+        log.info("client active,address:{},id:{}", remoteAddress, id);
 
         if (log.isDebugEnabled()) {
-            log.debug("Bound Channel Count is {}", this.channelRepository.size());
+            log.debug("Bound Channel Count is {}", this.contextRepository.size());
         }
 
     }
@@ -68,10 +69,11 @@ public class SimpleChatServerHandler extends ChannelInboundHandlerAdapter {
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
         String stringMessage = (String) msg;
         log.info("read message:{}", stringMessage);
+        log.info("ip:{}", ctx.channel().remoteAddress().toString());
         try {
-            hjParseService.process(stringMessage+"\r\n");
+            hjParseService.process(stringMessage + "\r\n");
         } catch (Exception e) {
-            log.info("parse exception,msg:{},e:{}",msg, e);
+            log.info("parse exception,msg:{},e:{}", msg, e);
         }
 
     }
@@ -83,8 +85,15 @@ public class SimpleChatServerHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) {
+        String remoteAddress = ctx.channel().remoteAddress().toString();
+        String id = ctx.channel().id().toString();
+        log.info("client inactive,address:{},id:{}", remoteAddress, id);
+        contextRepository.remove(id);
 
     }
 
-
+    @Override
+    public void channelUnregistered(ChannelHandlerContext ctx) throws Exception {
+        super.channelUnregistered(ctx);
+    }
 }

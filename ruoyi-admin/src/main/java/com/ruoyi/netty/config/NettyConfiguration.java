@@ -16,6 +16,7 @@
 package com.ruoyi.netty.config;
 
 import com.ruoyi.netty.ChannelRepository;
+import com.ruoyi.netty.ContextRepository;
 import com.ruoyi.netty.handler.SimpleChatChannelInitializer;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelOption;
@@ -71,5 +72,10 @@ public class NettyConfiguration {
     @Bean
     public ChannelRepository channelRepository() {
         return new ChannelRepository();
+    }
+
+    @Bean
+    public ContextRepository contextRepository() {
+        return new ContextRepository();
     }
 }
