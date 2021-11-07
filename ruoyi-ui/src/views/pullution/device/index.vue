@@ -35,7 +35,7 @@
 <!--      </el-form-item>-->
 <!--    </el-form>-->
 
-<!--    <el-row :gutter="10" class="mb8">-->
+    <el-row :gutter="10" class="mb8">
 <!--      <el-col :span="1.5">-->
 <!--        <el-button-->
 <!--          type="primary"-->
@@ -79,8 +79,8 @@
 <!--          v-hasPermi="['pullution:device:export']"-->
 <!--        >导出</el-button>-->
 <!--      </el-col>-->
-<!--      <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>-->
-<!--    </el-row>-->
+      <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
+    </el-row>
 
     <el-table v-loading="loading" :data="deviceList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
@@ -112,9 +112,16 @@
     <!-- 添加或修改因子信息对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
+        <el-form-item label="说明">
+          <h5>开阀 40001置位 为00 00 00 00 00 00 00 01  发 <strong style="color: red">010600000001</strong> 48 0a</h5>
+          <h5>关阀 40001置位 为00 00 00 00 00 00 00 10  发 <strong style="color: red">010600000002</strong> 08 0b</h5>
+          <h5>停止 40001置位 为00 00 00 00 00 00 00 00  发 <strong style="color: red">010600000000</strong> 89 ca</h5>
+        </el-form-item>
         <el-form-item label="id" prop="id">
           <el-input v-model="form.id" placeholder="请输入id" disabled/>
-          <textarea v-model="form.msg"></textarea>
+        </el-form-item>
+        <el-form-item label="指令" prop="msg">
+          <el-input v-model="form.msg" placeholder="请输入modbus指令（无需CRC）"/>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">

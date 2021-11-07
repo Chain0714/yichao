@@ -92,7 +92,7 @@ export default {
   data() {
     return {
       // 遮罩层
-      loading: true,
+      loading: false,
       // 导出遮罩层
       exportLoading: false,
       // 选中数组
@@ -140,7 +140,7 @@ export default {
     };
   },
   created() {
-    this.getList();
+    // this.getList();
     this.getDicts("pullution_data_type").then(response => {
       this.cnOptions = response.data;
     });
@@ -154,6 +154,10 @@ export default {
   methods: {
     /** 查询历史查询列表 */
     getList() {
+      if((!this.queryParams.cn || this.queryParams.cn=='')||(!this.queryParams.mn || this.queryParams.mn=='')){
+        this.msgInfo("请选择 数据类型 和 监测点");
+        return
+      }
       this.loading = true;
       this.queryParams.params = {};
       if (null != this.daterangeDataTime && '' != this.daterangeDataTime) {
